@@ -1,0 +1,276 @@
+/* Marigold road trip. One accent (marigold) = "Trippy found this": pins, card numbers, send / start.
+   Route = teal so it never competes with the pins. Ink for text and the one dark button per answer. */
+:root {
+  --bg: #FBF8F2; --surface: #FFFFFF; --sunk: #F3EEE4;
+  --ink: #1D1B16; --muted: #6B665C; --faint: #9C968A; --line: #E8E2D6;
+  --accent: #E89A0C; --accent-ink: #3A2600; --accent-soft: #FCEFD4;
+  --route: #0F6B5C; --danger: #C8321F; --danger-ink: #FFFFFF; --ok: #2F7D32;
+  --font: Inter, system-ui, sans-serif;
+  --display: 'Bricolage Grotesque', var(--font);
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px;
+  --r-sm: 8px; --r: 12px; --r-pill: 999px;
+  --tap: 44px;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14130F; --surface: #1F1D18; --sunk: #191813;
+    --ink: #F3EFE6; --muted: #A39D90; --faint: #6F6A5F; --line: #2E2B24;
+    --accent: #F2AE2E; --accent-ink: #2A1B00; --accent-soft: #3A2C10;
+    --route: #4FC3AE; --danger: #E5533F; --ok: #6CC070;
+  }
+}
+
+* { box-sizing: border-box }
+html, body, #root { height: 100% }
+body { margin: 0; font: 15px/1.45 var(--font); color: var(--ink); background: var(--bg); -webkit-font-smoothing: antialiased }
+button { font: inherit; color: inherit; cursor: pointer; background: none; border: 0; padding: 0 }
+input { font: inherit; color: inherit }
+a { color: inherit }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.h { font-family: var(--display); font-weight: 700; letter-spacing: -0.01em }
+.muted { color: var(--muted) }
+svg.i { width: 20px; height: 20px; flex: none; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round }
+
+/* Buttons: one primary (marigold) per screen, ink for the main link action, the rest outlined. */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--s2); min-height: var(--tap); padding: 0 var(--s4);
+  border-radius: var(--r); border: 1px solid var(--line); background: var(--surface); font-weight: 500; text-decoration: none }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; font-weight: 600 }
+.btn.wide { width: 100% }
+.btn.quiet { border-color: transparent; background: none; color: var(--muted); min-height: 36px }
+.btn:disabled { opacity: .5; cursor: default }
+.icon-btn { display: inline-grid; place-items: center; width: var(--tap); height: var(--tap); border-radius: var(--r-pill); color: var(--muted) }
+.icon-btn:hover { background: var(--sunk); color: var(--ink) }
+.icon-btn.on { background: var(--accent-soft); color: var(--ink) }
+.tripbar .live { color: var(--route); font-weight: 600 }
+
+/* Single-column screens: landing, settings, profile. */
+.screen { min-height: 100%; max-width: 480px; margin: 0 auto; padding: max(var(--s5), env(safe-area-inset-top)) var(--s4) max(var(--s4), env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: var(--s4) }
+.screen-head { display: flex; align-items: center; gap: var(--s2); margin-left: calc(-1 * var(--s2)) }
+.screen-head h1 { margin: 0; font-size: 22px }
+.wordmark { margin: var(--s6) 0 0; font-size: 44px; line-height: 1 }
+.wordmark span { color: var(--accent) }
+.tagline { margin: var(--s2) 0 var(--s3); font-size: 16px; color: var(--muted); max-width: 30ch }
+.landing-foot { margin-top: auto; display: flex; justify-content: space-between; padding-top: var(--s4) }
+.landing-foot .btn { border: 0; background: none; color: var(--muted); padding: 0 var(--s2) }
+.note { font-size: 13px; color: var(--muted); text-align: center; margin: 0 }
+
+/* From / To box with Google suggestions. */
+.places { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface) }
+.place { position: relative; display: flex; align-items: center; gap: var(--s3); padding: 0 var(--s3) }
+.place + .place { border-top: 1px solid var(--line) }
+.place .dot { width: 10px; height: 10px; border-radius: 50%; border: 3px solid var(--route); flex: none }
+.place + .place .dot { border-radius: 2px; border-color: var(--ink); background: var(--ink) }
+.place input { flex: 1; min-width: 0; height: 52px; border: 0; background: none; outline: none; font-size: 16px }
+.place input::placeholder { color: var(--faint) }
+.place .tick { color: var(--ok); font-size: 13px; font-weight: 600 }
+.suggest { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 20; margin: 0; padding: var(--s1) 0; list-style: none;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: 0 8px 24px rgb(0 0 0 / .14); max-height: 300px; overflow: auto }
+.suggest li { display: flex; flex-direction: column; padding: var(--s2) var(--s4); cursor: pointer }
+.suggest li span { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.suggest li.active { background: var(--sunk) }
+
+/* Trip view: map on top, chat below; side by side from 900 px (Q13). */
+.trip { display: flex; flex-direction: column; height: 100dvh }
+.map { flex: 0 0 40%; min-height: 0; position: relative; background: var(--sunk) }
+.panel { flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--bg); border-top: 1px solid var(--line) }
+@media (min-width: 900px) {
+  .trip { flex-direction: row-reverse }
+  .map { flex: 1 }
+  .panel { flex: 0 0 420px; border-top: 0; border-right: 1px solid var(--line) }
+}
+.map-off { height: 100%; margin: 0; display: grid; place-items: center; padding: var(--s4); color: var(--muted); font-size: 14px; text-align: center }
+.tripbar { display: flex; align-items: center; gap: var(--s1); padding: var(--s1) var(--s2); border-bottom: 1px solid var(--line) }
+.tripbar .route { flex: 1; min-width: 0; min-height: var(--tap); display: flex; align-items: center; gap: var(--s1); padding: var(--s1) var(--s2); border-radius: var(--r-sm); text-align: left }
+.tripbar .route:hover, .tripbar .route[aria-expanded=true] { background: var(--sunk) }
+.tripbar .route .i { color: var(--muted); width: 18px; height: 18px }
+.tripbar .text { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25 }
+.tripbar .text b, .tripbar .text > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.tripbar .text b { font-weight: 600 }
+.tripbar .text > span { font-size: 13px; color: var(--muted) }
+
+/* Plan sheet (opens from the trip bar): start, stops and destinations as a timeline; reached ones ticked. */
+.sheet { display: flex; flex-direction: column; gap: var(--s3); padding: var(--s3); border-bottom: 1px solid var(--line); background: var(--surface); position: relative; z-index: 2 }
+.plan { margin: 0; padding: 0; list-style: none }
+.plan li { position: relative; display: flex; align-items: center; gap: var(--s3); min-height: var(--tap); padding-left: var(--s1) }
+.plan li + li::before { content: ''; position: absolute; left: calc(var(--s1) + 8px); top: -12px; height: 24px; border-left: 2px dotted var(--line) }
+.plan .mark { position: relative; z-index: 1; flex: none; width: 18px; height: 18px; display: grid; place-items: center; border-radius: 50%;
+  background: var(--surface); border: 3px solid var(--route); font-size: 11px; font-weight: 700; color: var(--surface) }
+.plan .stop .mark { border-color: var(--accent) }
+.plan .destination .mark { border-radius: 4px; border-color: var(--ink) }
+.plan .done .mark { background: var(--route); border-color: var(--route) }
+.plan .start .mark { background: var(--surface); border-color: var(--route) }
+.plan .name { flex: 1; min-width: 0; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.plan .done .name { color: var(--muted); font-weight: 400 }
+.plan .meta { font-size: 13px; color: var(--muted); white-space: nowrap }
+.plan .icon-btn { width: 36px; height: 36px; margin-right: calc(-1 * var(--s2)) }
+.plan .icon-btn .i { width: 18px; height: 18px }
+.next { display: flex; gap: var(--s2) }
+.next .places { flex: 1; min-width: 0 }
+.next .place input { height: var(--tap) }
+.row-btns { display: flex; gap: var(--s2) }
+.row-btns > * { flex: 1 }
+.btn.danger { background: var(--danger); color: var(--danger-ink); border-color: transparent; font-weight: 600 }
+.btn.danger-text { color: var(--danger); min-height: var(--tap) }
+.sheet-foot { display: flex; justify-content: space-between; margin: calc(-1 * var(--s2)) 0 calc(-1 * var(--s2)) }
+.confirm {display: flex; flex-direction: column; gap: var(--s2); padding: var(--s3); border-radius: var(--r); background: var(--sunk) }
+.confirm p { margin: 0; font-size: 14px }
+.panel > .note { padding: var(--s1) var(--s3); color: var(--danger) }
+
+/* Add-stop preview: replaces the composer until Add stop or Cancel. */
+.preview { display: flex; align-items: center; gap: var(--s2); padding: var(--s2) var(--s3) max(var(--s3), env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: var(--surface) }
+.preview .body { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25 }
+.preview .body b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.preview .body span { font-size: 14px; color: var(--route); font-weight: 600 }
+.preview .btn { padding: 0 var(--s3) }
+
+/* Map pins: marigold teardrop with the card number; the selected one turns ink and grows. */
+.pin { width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--accent); border: 2px solid var(--surface);
+  display: grid; place-items: center; box-shadow: 0 2px 6px rgb(0 0 0 / .3); transition: transform .15s }
+.pin b { transform: rotate(45deg); color: var(--accent-ink); font-size: 13px }
+.pin.on { background: var(--ink); transform: rotate(-45deg) scale(1.25) }
+.pin.on b { color: var(--bg) }
+.endpoint { width: 16px; height: 16px; border-radius: 50%; background: var(--surface); border: 4px solid var(--route); box-shadow: 0 1px 4px rgb(0 0 0 / .3) }
+.endpoint.dest { border-radius: 4px; background: var(--ink); border-color: var(--surface) }
+.endpoint.stop { width: 14px; height: 14px; border-width: 3px; border-color: var(--accent) }
+
+/* Chat. */
+.chat { flex: 1; overflow: auto; padding: var(--s2) var(--s3) var(--s3); display: flex; flex-direction: column; gap: var(--s2) }
+.msg { max-width: 92%; padding: var(--s2) var(--s3); border-radius: var(--r); background: var(--surface); border: 1px solid var(--line) }
+.msg p { margin: 0; white-space: pre-wrap }
+.msg.user { align-self: flex-end; background: var(--ink); color: var(--bg); border-color: transparent; border-bottom-right-radius: var(--s1) }
+.msg.assistant { align-self: flex-start; border-bottom-left-radius: var(--s1) }
+.msg.answer { max-width: 100%; width: 100% }
+.msg.answer p + .cards { margin-top: var(--s2) }
+.welcome { padding: var(--s3) var(--s1) }
+.welcome h2 { margin: 0 0 var(--s1); font-size: 20px }
+.welcome p { margin: 0 0 var(--s3) }
+.chips { display: flex; flex-wrap: wrap; gap: var(--s2) }
+.chip { min-height: 36px; padding: 0 var(--s3); border: 1px solid var(--line); border-radius: var(--r-pill); background: var(--surface); font-size: 14px }
+.chip:hover { border-color: var(--accent) }
+
+/* Result cards, numbered to match the pins. */
+.cards { display: flex; flex-direction: column }
+.card { display: flex; gap: var(--s3); align-items: flex-start; padding: var(--s3) var(--s1); border-top: 1px solid var(--line); text-align: left; width: 100% }
+.card .n { flex: 0 0 26px; height: 26px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-size: 13px; font-weight: 600; display: grid; place-items: center }
+.card .body { display: flex; flex-direction: column; gap: 2px; min-width: 0 }
+.card .name { font-weight: 600 }
+.card .meta { font-size: 13px; color: var(--muted) }
+.card .meta .closed { color: var(--danger) }
+.card .why { font-size: 14px }
+.card.old .n { background: var(--sunk); color: var(--muted) }
+.card.live { cursor: pointer; border-radius: var(--r-sm) }
+.card.live:hover { background: var(--sunk) }
+.card.selected { background: var(--accent-soft) }
+.card.selected .n { background: var(--ink); color: var(--bg) }
+.pick { display: flex; align-items: flex-start; border-top: 1px solid var(--line) }
+.pick .card { flex: 1; min-width: 0; border-top: 0 }
+.add { flex: none; display: inline-flex; align-items: center; gap: 4px; min-height: 36px; margin: var(--s3) 0 0 var(--s1); padding: 0 var(--s3);
+  border: 1px solid var(--accent); border-radius: var(--r-pill); font-size: 13px; font-weight: 600; white-space: nowrap }
+.add .i { width: 16px; height: 16px }
+.add:hover:not(:disabled), .add.on { background: var(--accent); color: var(--accent-ink) }
+.add:disabled { opacity: .5; cursor: default }
+.add.added { border-color: transparent; color: var(--route) }
+
+.links { display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s2) }
+.links a { min-height: 40px; padding: 0 var(--s4); border-radius: var(--r-pill); font-size: 14px; font-weight: 500 }
+.links a:first-child { background: var(--ink); color: var(--bg); border-color: transparent }
+
+/* Two model calls: understand (pick) -> search -> rank. Stage comes from the agent's busy text. */
+.steps { display: flex; flex-direction: column; gap: var(--s2) }
+.steps ol { display: flex; gap: var(--s2); margin: 0; padding: 0; list-style: none; font-size: 13px; color: var(--faint) }
+.steps li { display: flex; align-items: center; gap: 6px }
+.steps li::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--line) }
+.steps li.done { color: var(--muted) }
+.steps li.done::before { background: var(--route) }
+.steps li.now { color: var(--ink); font-weight: 500 }
+.steps li.now::before { background: var(--accent); animation: pulse .8s infinite alternate }
+.steps p { font-size: 14px; color: var(--muted) }
+@keyframes pulse { from { opacity: .3; transform: scale(.8) } to { opacity: 1; transform: scale(1.1) } }
+@media (prefers-reduced-motion: reduce) { .steps li.now::before { animation: none } }
+
+.composer { display: flex; gap: var(--s2); padding: var(--s2) var(--s3) max(var(--s3), env(safe-area-inset-bottom)); border-top: 1px solid var(--line) }
+.composer input { flex: 1; min-width: 0; height: var(--tap); padding: 0 var(--s4); border: 1px solid var(--line); border-radius: var(--r-pill); background: var(--surface); font-size: 16px; outline: none }
+.composer input:focus { border-color: var(--accent) }
+.composer button { width: var(--tap); height: var(--tap); border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center }
+.composer button:disabled { background: var(--sunk); color: var(--faint); cursor: default }
+
+/* Emergency: shown only when the keyword check fires (Q35). Always red, always a real tel: link. */
+.sos { display: flex; align-items: center; justify-content: center; gap: var(--s2); margin: var(--s2) var(--s3) 0; min-height: 52px; border-radius: var(--r);
+  background: var(--danger); color: var(--danger-ink); font-size: 17px; font-weight: 700; text-decoration: none }
+
+/* Long-ETA / ETA-jump banner (Q31, Q34): no model call until tapped. */
+.banner { display: flex; align-items: center; gap: var(--s2); margin: var(--s2) var(--s3) 0; padding: var(--s2) var(--s1) var(--s2) var(--s3); border-radius: var(--r); background: var(--accent-soft); color: var(--ink) }
+.banner p { flex: 1; margin: 0; font-size: 14px }
+.banner > button:not(.icon-btn) { min-height: 36px; padding: 0 var(--s3); border-radius: var(--r-pill); background: var(--accent); color: var(--accent-ink); font-weight: 600; font-size: 14px; white-space: nowrap }
+.banner .icon-btn { width: 36px; height: 36px }
+
+/* Settings and profile lists. */
+.section { display: flex; flex-direction: column; gap: var(--s2) }
+.section h2 { margin: 0; font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em }
+.section > p { margin: 0; font-size: 14px; color: var(--muted) }
+.rows { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface) }
+.row { display: flex; align-items: center; gap: var(--s3); padding: var(--s3) var(--s4); min-height: 56px }
+.row + .row { border-top: 1px solid var(--line) }
+.row .body { flex: 1; min-width: 0; display: flex; flex-direction: column }
+.row .body span { font-size: 13px; color: var(--muted); overflow-wrap: anywhere }
+.tag { font-size: 12px; padding: 2px var(--s2); border-radius: var(--r-pill); background: var(--sunk); color: var(--muted); white-space: nowrap }
+.tag.on { background: var(--accent-soft); color: var(--ink) }
+.fields { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface) }
+.fields label { display: flex; flex-direction: column; padding: var(--s2) var(--s4); font-size: 12px; color: var(--muted) }
+.fields label + label { border-top: 1px solid var(--line) }
+.fields input { height: 32px; border: 0; background: none; outline: none; font-size: 16px; color: var(--ink) }
+.fields .place { padding: 0 }
+.fields .place .dot { display: none }
+.section > p[role=status] { color: var(--ok) }
+.empty {padding: var(--s5) var(--s4); text-align: center; color: var(--muted); font-size: 14px }
+
+/* Outing planner (Planner.tsx): request -> what was understood -> timeline. Reuses the trip layout, cards, pins and chips. */
+.ask textarea { width: 100%; min-height: 112px; padding: var(--s3); border: 1px solid var(--line); border-radius: var(--r); background: var(--surface);
+  font: inherit; font-size: 16px; color: inherit; resize: vertical; outline: none }
+.ask textarea:focus { border-color: var(--accent) }
+.ask .chip { text-align: left; min-height: var(--tap); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100% }
+.chip.on { background: var(--accent-soft); border-color: var(--accent); font-weight: 500 }
+.chip b { margin-right: 6px }
+.chip:disabled { opacity: .5; cursor: default }
+.fields select { height: 32px; border: 0; background: none; outline: none; font: inherit; font-size: 16px; color: var(--ink) }
+.outing { flex: 1; overflow: auto; padding: var(--s3); display: flex; flex-direction: column; gap: var(--s3) }
+.outing .banner { margin: 0; padding: var(--s2) var(--s3) }
+.outing .card:first-child, .outing .cards > div:first-child .card { border-top: 0 }
+.outing .card .name { text-align: left }
+.outing .card .name:hover { text-decoration: underline }
+.leg { margin: 0; padding: var(--s1) 0 var(--s1) calc(26px + var(--s3) + var(--s1)); font-size: 13px; color: var(--route); font-weight: 500 }
+.card .src, .card details { font-size: 13px; color: var(--muted) }
+.card details summary { cursor: pointer; min-height: 32px; display: flex; align-items: center }
+.card details ul { margin: 0 0 var(--s2); padding-left: var(--s4); display: flex; flex-direction: column; gap: var(--s1) }
+
+/* Trip map: re-centre (shown when the user has moved the map off the car). Folded cards: name + minutes. */
+.recenter { position: absolute; right: var(--s3); bottom: var(--s5); width: var(--tap); height: var(--tap); display: grid; place-items: center;
+  border-radius: 50%; background: var(--surface); color: var(--route); border: 1px solid var(--line); box-shadow: 0 2px 8px rgb(0 0 0 / .25) }
+.fold { align-self: flex-end; display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 0 var(--s2); font-size: 13px; color: var(--muted) }
+.fold .i { width: 16px; height: 16px }
+.cards.folded .card { padding: var(--s2) var(--s1) }
+.cards.folded .why, .cards.folded .extra { display: none }
+.cards.folded .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.cards.folded .add { margin-top: var(--s2) }
+
+/* Settings switch: a checkbox drawn as a pill. */
+.switch { cursor: pointer }
+.switch input { appearance: none; flex: none; width: 44px; height: 26px; margin: 0; border-radius: var(--r-pill); background: var(--line); position: relative; cursor: pointer; transition: background .15s }
+.switch input::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--surface); box-shadow: 0 1px 3px rgb(0 0 0 / .25); transition: transform .15s }
+.switch input:checked { background: var(--route) }
+.switch input:checked::after { transform: translateX(18px) }
+
+/* How Trippy decided (FEATURES #25): one folded line under an answer. */
+.how { margin-top: var(--s2); border-top: 1px dashed var(--line); font-size: 13px; color: var(--muted) }
+.how summary { display: flex; align-items: center; gap: 6px; min-height: 36px; cursor: pointer; list-style: none; font-variant-numeric: tabular-nums }
+.how summary::-webkit-details-marker { display: none }
+.how summary .i { width: 16px; height: 16px; transition: transform .15s }
+.how[open] summary .i { transform: rotate(180deg) }
+.how dl { display: grid; grid-template-columns: auto 1fr; gap: var(--s2) var(--s3); margin: 0 0 var(--s2); padding: var(--s3); border-radius: var(--r-sm); background: var(--sunk) }
+.how dt { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); padding-top: 2px }
+.how dd { margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 6px; color: var(--ink); overflow-wrap: anywhere }
+.how dd b { font-weight: 600 }
+.how small { display: block; font: 11px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--faint) }
+.how code { font: 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; padding: 1px 5px; border-radius: 4px; background: var(--surface); color: var(--route) }
+@media (prefers-reduced-motion: reduce) { .how summary .i, .switch input, .switch input::after { transition: none } }

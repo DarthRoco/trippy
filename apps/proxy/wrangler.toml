@@ -1,0 +1,17 @@
+# Cloudflare Worker for the proxy. Secrets (never in this file): NEBIUS_API_KEY, GOOGLE_MAPS_SERVER_KEY, TAVILY_API_KEY.
+name = "trippy-proxy"
+main = "src/worker.ts"
+compatibility_date = "2026-10-01"
+
+[vars]
+# Pages URL (production + preview deployments). If Cloudflare assigns a suffix when the name is taken, use that host here.
+ALLOWED_ORIGINS = "https://trippy.pages.dev,https://*.trippy.pages.dev"
+
+# Daily cap counters (worker.ts, class Caps).
+[[durable_objects.bindings]]
+name = "CAPS"
+class_name = "Caps"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Caps"]

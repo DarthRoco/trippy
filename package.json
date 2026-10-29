@@ -1,0 +1,22 @@
+{
+  "name": "trippy",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:proxy": "npm run dev -w apps/proxy",
+    "dev:web": "npm run dev -w apps/web",
+    "check": "node packages/core/src/geo.check.ts && node packages/core/src/context.check.ts && node packages/core/src/time.check.ts && node packages/core/src/agent.check.ts && node apps/proxy/src/handler.check.ts && npm run -s check:planner",
+    "check:planner": "node packages/core/src/planner/hours.check.ts && node packages/core/src/planner/sun.check.ts && node packages/core/src/planner/search.check.ts && node packages/core/src/planner/places.check.ts && node packages/core/src/planner/parse.check.ts && node packages/core/src/planner/enrich.check.ts && node packages/core/src/planner/explain.check.ts && node packages/core/src/planner/plan.check.ts",
+    "typecheck": "tsc -p .",
+    "e2e": "node tests/e2e/run.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.0",
+    "@types/node": "^26.6.4",
+    "typescript": "^7.0.2"
+  }
+}

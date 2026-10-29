@@ -1,0 +1,8 @@
+.env
+node_modules
+dist
+.claude/worktrees/
+logs
+.wrangler
+.dev.vars
+test-results
