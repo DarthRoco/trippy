@@ -12,7 +12,7 @@ import { ANNOUNCES, counts, events, istNow, planned, problems, RAW, read, skippe
 
 const args = process.argv.slice(2)
 const flag = (name: string) => args.find(a => a === `--${name}` || a.startsWith(`--${name}=`))?.split('=')[1] ?? (args.includes(`--${name}`) ? '1' : '')
-const base = flag('url') || (flag('local') ? `http://localhost:${flag('local') === '1' ? 5173 : flag('local')}` : 'https://trippy.pages.dev')
+const base = flag('url') || (flag('local') ? `http://localhost:${flag('local') === '1' ? 5173 : flag('local')}` : 'https://trippy-c20.pages.dev')
 const ids = args.filter(a => /^F\d+$/.test(a))
 const flows = ids.length ? FLOWS.filter(f => ids.includes(f.id)) : FLOWS
 const dir = `test-results/e2e/${new Date().toISOString().slice(0, 19).replace(/[-:]/g, '').replace('T', '-')}`

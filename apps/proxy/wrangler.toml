@@ -4,8 +4,8 @@ main = "src/worker.ts"
 compatibility_date = "2026-10-01"
 
 [vars]
-# Pages URL (production + preview deployments). If Cloudflare assigns a suffix when the name is taken, use that host here.
-ALLOWED_ORIGINS = "https://trippy.pages.dev,https://*.trippy.pages.dev"
+# Pages URL (production + preview deployments). "trippy.pages.dev" was taken; Cloudflare assigned trippy-c20.
+ALLOWED_ORIGINS = "https://trippy-c20.pages.dev,https://*.trippy-c20.pages.dev"
 
 # Daily cap counters (worker.ts, class Caps).
 [[durable_objects.bindings]]

@@ -2,7 +2,7 @@
 
 Trippy is an AI decision layer on top of Google Maps data, for passengers in India. You say what the car needs ("dad is hungry, something like Domino's within 20 minutes", in English or Hinglish). Trippy finds real places along your route, checks live travel times and opening hours, weighs the trade-off for your group and shows the best three on a map with a short reason for each. It also plans outings before you leave. It is not a navigation app: Google routes, Trippy decides.
 
-- Live app: https://trippy.pages.dev (no key or sign-in needed)
+- Live app: https://trippy-c20.pages.dev (no key or sign-in needed)
 - Video: <YouTube link>
 - Built for the Nebius x NVIDIA Global AI Hackathon, track Best Apps and Agents. Models: NVIDIA Nemotron 3 (Nano, Super, Ultra) on Nebius Token Factory.
 - Team: Shreyas Bhat ([DarthRoco](https://github.com/DarthRoco)) and Shruti Prakhya ([wannabe-yoda](https://github.com/wannabe-yoda)).
@@ -10,7 +10,7 @@ Trippy is an AI decision layer on top of Google Maps data, for passengers in Ind
 ## Try it (for judges)
 You do not need to be in Mumbai or in a car.
 
-1. Open https://trippy.pages.dev. On a phone, add it to the home screen to install it.
+1. Open https://trippy-c20.pages.dev. On a phone, add it to the home screen to install it.
 2. Type a start and a destination and pick both from the suggestions. A tested pair: **Kurla West** to **Domino's Pizza, Juhu Beach**. Tap **Start trip**. If the trip is long, a banner offers to look for something closer.
 3. Tap the play button in the trip bar (**Replay this drive**). The app then drives the route on a simulated GPS trace, ten times faster than real time, and uses live Google data around the replayed position. (On the landing screen the same thing is **Replay a drive**, once a trip exists.) The trace is simulated along Google's route, not a recording of a real drive.
 4. While it plays, ask for things. These worked in our tests:
@@ -137,14 +137,14 @@ npm run e2e -- --local=5174 F1 F10   # localhost (web app on 5174 and npm run de
 Other flags: `--url=<site>`, `--chrome` (installed Chrome), `--headed`. Results go to `test-results/e2e/<time>/`: `summary.json` (every code check, the judge notes for a reviewer), and per flow each step's screen text, screenshot and trip document plus the flow's debug log. Flows are data in `tests/e2e/flows.ts`, helpers in `tests/e2e/lib.ts`. The exit code is 1 when a code check failed.
 
 ## Deploy (Cloudflare, free plan)
-- App (Pages project `trippy`): https://trippy.pages.dev. Pushing to `main` rebuilds it; other branches get preview URLs (`https://<branch>.trippy.pages.dev`).
+- App (Pages project `trippy`): https://trippy-c20.pages.dev. Pushing to `main` rebuilds it; other branches get preview URLs (`https://<branch>.trippy-c20.pages.dev`).
   Pages settings: build command `npm run build -w apps/web`, output `apps/web/dist`, variables `NODE_VERSION=22`, `VITE_PROXY_URL` (the Worker URL), `GOOGLE_MAPS_BROWSER_KEY`.
-- Proxy (Worker `trippy-proxy`): https://trippy-proxy.<account-subdomain>.workers.dev, config in `apps/proxy/wrangler.toml`, entry `apps/proxy/src/worker.ts` (wraps `handler.ts`). Pushing to `main` redeploys it (Workers Builds, root directory `apps/proxy`).
+- Proxy (Worker `trippy-proxy`): https://trippy-proxy.trippy-app.workers.dev, config in `apps/proxy/wrangler.toml`, entry `apps/proxy/src/worker.ts` (wraps `handler.ts`). Pushing to `main` redeploys it (Workers Builds, root directory `apps/proxy`).
   Secrets live only in Cloudflare (Worker -> Settings -> Variables and Secrets): `NEBIUS_API_KEY`, `GOOGLE_MAPS_SERVER_KEY`, `TAVILY_API_KEY`.
   Allowed web origins are `ALLOWED_ORIGINS` in `wrangler.toml` (a `https://*.host` entry also accepts preview subdomains).
   Daily caps are counted in a Durable Object (`Caps` in `worker.ts`), so they survive restarts.
 - Manual deploy of the Worker: `npm run deploy -w apps/proxy` (needs `npx wrangler login` once). The local Node proxy (`npm run dev:proxy`) stays for development.
-- Google Cloud: the browser key's website restrictions must list `https://trippy.pages.dev/*` and `https://*.trippy.pages.dev/*`.
+- Google Cloud: the browser key's website restrictions must list `https://trippy-c20.pages.dev/*` and `https://*.trippy-c20.pages.dev/*`.
 
 ## Layout
 - `packages/core`: tools, map provider, agent loop, model config, outing planner
