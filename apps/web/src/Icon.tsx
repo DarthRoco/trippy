@@ -20,3 +20,16 @@ const paths = {
 export function Icon({ name }: { name: keyof typeof paths }) {
   return <svg className="i" viewBox="0 0 24 24" aria-hidden="true"><path d={paths[name]} /></svg>
 }
+
+// Home button icons that move (styles.css, "Home icons"): lines in the text colour, one accent detail (.o). The moving parts
+// are named for their keyframes.
+const art = {
+  pin: <><g className="drop"><path d="M12 20s-6-5.3-6-9.5a6 6 0 0 1 12 0C18 14.7 12 20 12 20z" /><circle className="o" cx="12" cy="10.5" r="2.2" /></g><path d="M9 22.5h6" /></>,
+  rings: <><circle className="r2" cx="12" cy="12" r="9.5" /><circle className="r1" cx="12" cy="12" r="5.5" /><circle className="o" cx="12" cy="12" r="2.2" /></>,
+  fold: <><path className="p1" d="M3 7l6-3v13l-6 3z" /><path d="M9 4l6 3v13l-6-3z" /><path className="p3" d="M15 7l6-3v13l-6 3z" /><circle className="o" cx="12" cy="11.5" r="1.8" /></>,
+  drive: <><path d="M4 19c0-6 4-7 8-7s8-1 8-7" /><circle className="o dot" r="2.2" /></>,
+}
+
+export function Art({ name }: { name: keyof typeof art }) {
+  return <svg className="art" viewBox="0 0 24 24" aria-hidden="true">{art[name]}</svg>
+}

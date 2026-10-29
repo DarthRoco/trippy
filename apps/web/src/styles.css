@@ -274,3 +274,25 @@ svg.i { width: 20px; height: 20px; flex: none; stroke: currentColor; fill: none;
 .how small { display: block; font: 11px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--faint) }
 .how code { font: 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; padding: 1px 5px; border-radius: 4px; background: var(--surface); color: var(--route) }
 @media (prefers-reduced-motion: reduce) { .how summary .i, .switch input, .switch input::after { transition: none } }
+
+/* Home icons (Start trip, Search around me, Replay a drive, Plan an outing): they play once on load, staggered by --d, then
+   again on hover or tap (Screens.tsx "replay"). Lines in the text colour, one accent detail; pure CSS, off with reduce-motion. */
+svg.art { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  overflow: visible; transition: transform .15s }
+.btn:hover:not(:disabled) .art { transform: scale(1.1) }
+.art .o { fill: var(--accent); stroke: none }
+.btn.primary .art .o { fill: currentColor } /* the accent dot would vanish on the accent button */
+.art .drop, .art .r1, .art .r2, .art .p1, .art .p3 { transform-box: fill-box; transform-origin: center }
+.art .p1 { transform-origin: right } .art .p3 { transform-origin: left }
+.art .dot { offset-path: path('M4 19c0-6 4-7 8-7s8-1 8-7'); offset-distance: 100%; offset-rotate: 0deg }
+.play .art .drop { animation: drop .8s var(--d, 0s) both }
+.play .art .r1 { animation: ring .8s var(--d, 0s) ease-out both }
+.play .art .r2 { animation: ring2 .8s var(--d, 0s) ease-out both }
+.play .art .p1, .play .art .p3 { animation: unfold .7s var(--d, 0s) cubic-bezier(.2, .8, .3, 1) both }
+.play .art .dot { animation: travel .9s var(--d, 0s) ease-in-out both }
+@keyframes drop { 0% { transform: translateY(-9px); opacity: 0 } 45% { transform: none; opacity: 1 } 65% { transform: translateY(-3px) } 85%, 100% { transform: none } }
+@keyframes ring { 0% { transform: scale(.3); opacity: 0 } 60%, 100% { transform: none; opacity: 1 } }
+@keyframes ring2 { 0%, 30% { transform: scale(.4); opacity: 0 } 100% { transform: none; opacity: 1 } }
+@keyframes unfold { from { transform: scaleX(0) } }
+@keyframes travel { from { offset-distance: 0% } }
+@media (prefers-reduced-motion: reduce) { .play .art * { animation: none !important } svg.art, .btn:hover .art { transition: none; transform: none } }

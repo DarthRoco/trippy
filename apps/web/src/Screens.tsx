@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { load, remove, save } from './store.ts'
 import { MODELS, byo, type Note, type Trip } from '@trippy/core'
-import { Icon } from './Icon.tsx'
+import { Art, Icon } from './Icon.tsx'
 import { PlaceInput, type Place } from './PlaceInput.tsx'
 import { exportLog, exportTrace } from './log.ts'
 
@@ -39,21 +39,21 @@ export function Landing({ trip, busy, error, onStart, onHere, onContinue, onRepl
           <PlaceInput label="From" place={from} onChange={setFrom} />
           <PlaceInput label="To" place={to} onChange={setTo} />
         </div>
-        <button className="btn primary wide" disabled={!!busy}>{busy || 'Start trip'}</button>
+        <button className="btn primary wide play" style={delay(0)} disabled={!!busy} {...replay}><Art name="pin" /> {busy || 'Start trip'}</button>
         {!ready && (from.text || to.text) && <p className="note">Pick both places from the suggestions.</p>}
         {error && <p className="note" role="alert">{error}</p>}
-        <button type="button" className="btn wide quiet" disabled={!!busy} onClick={onHere}>
-          <Icon name="locate" /> No destination? Search around me
+        <button type="button" className="btn wide quiet play" style={delay(1)} disabled={!!busy} onClick={onHere} {...replay}>
+          <Art name="rings" /> No destination? Search around me
         </button>
       </form>
-      <button className="btn wide" onClick={() => trip?.route ? onReplay() : setReplayNote(true)}>
-        <Icon name="play" /> Replay a drive
+      <button className="btn wide play" style={delay(2)} onClick={() => trip?.route ? onReplay() : setReplayNote(true)} {...replay}>
+        <Art name="drive" /> Replay a drive
       </button>
       {replayNote && <p className="note">Start a trip first, then replay drives it for you.</p>}
       {/* The second option: plan an outing before leaving (Planner.tsx). Independent of the trip above. */}
       <section className="section">
         <h2>Not on the road yet?</h2>
-        <button className="btn wide" onClick={onPlan}><Icon name="map" /> Plan an outing</button>
+        <button className="btn wide play" style={delay(3)} onClick={onPlan} {...replay}><Art name="fold" /> Plan an outing</button>
         <p>Say what you want to do. It builds a timed plan from real places, with opening hours and travel times checked.</p>
       </section>
       <nav className="landing-foot">
@@ -63,6 +63,15 @@ export function Landing({ trip, busy, error, onStart, onHere, onContinue, onRepl
     </main>
   )
 }
+
+// The four home buttons' icons play once on load (class "play" in the markup, staggered 80 ms by --d), then again on hover
+// (mouse) or tap. The class goes on and off in the DOM; React leaves it alone because className never changes.
+const replay = {
+  onPointerEnter: (e: React.PointerEvent<HTMLElement>) => { if (e.pointerType === 'mouse') e.currentTarget.classList.add('play') },
+  onPointerDown: (e: React.PointerEvent<HTMLElement>) => e.currentTarget.classList.add('play'),
+  onAnimationEnd: (e: React.AnimationEvent<HTMLElement>) => { e.currentTarget.classList.remove('play'); e.currentTarget.style.removeProperty('--d') },
+}
+const delay = (i: number) => ({ '--d': `${i * 80}ms` }) as React.CSSProperties
 
 // What each model call does. Read from the one MODELS config, so this never drifts from the code (H1).
 const TIERS: { key: keyof typeof MODELS; job: string }[] = [
