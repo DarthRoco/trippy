@@ -6,6 +6,9 @@ Trippy is an AI decision layer on top of Google Maps data, for passengers in Ind
 - Video: <YouTube link>
 - Built for the Nebius x NVIDIA Global AI Hackathon, track Best Apps and Agents. Models: NVIDIA Nemotron 3 (Nano, Super, Ultra) on Nebius Token Factory.
 - Team: Shreyas Bhat ([DarthRoco](https://github.com/DarthRoco)) and Shruti Prakhya ([wannabe-yoda](https://github.com/wannabe-yoda)).
+- History: this repo was started fresh when the project was renamed to Trippy on 29 October 2026. The work from 1 to 29 October (pull requests, design notes, test logs) lives in our private working repo; the code here is the same.
+
+<img src="docs/outing-plan.png" alt="Trippy's outing planner: three timed stops around Bandra West on the map, with opening hours, travel time and sunset checked" width="300">
 
 ## Try it (for judges)
 You do not need to be in Mumbai or in a car.
@@ -86,11 +89,11 @@ Why these: in our day-1 tests Nano picked the right tool 3 times in 6 and Super 
 - Your own key, if you add one, is saved on the phone and sent only to the provider you named.
 
 ## How it was tested
-- **Test requests**: `TESTSET` holds 71 requests the agent must handle: rescue, follow-ups, memory, planning, emergencies and absurd asks. The first 30 ran on three routes in Mumbai, three times each, with the real models (89 to 90 of 90 after fixes). Failures became fixes and then new cases.
-- **End-to-end flows**: ten long trip flows across five cities (Mumbai, Delhi, Bengaluru, Kolkata, Hyderabad) in real browsers, with fake GPS and fast replay. A script checks the saved trip document, places, buttons and answer times at every step; a reviewer reads the rest. Two full runs on the live site on 10 October found 11 and then 12 real bugs. They became TESTSET cases #46 to #70 and the fixes in PRs #18 to #24.
+- **Test requests**: the test set (`packages/core/src/testset.run.ts`) holds 71 requests the agent must handle: rescue, follow-ups, memory, planning, emergencies and absurd asks. The first 30 ran on three routes in Mumbai, three times each, with the real models (89 to 90 of 90 after fixes). Failures became fixes and then new cases.
+- **End-to-end flows**: ten long trip flows across five cities (Mumbai, Delhi, Bengaluru, Kolkata, Hyderabad) in real browsers, with fake GPS and fast replay. A script checks the saved trip document, places, buttons and answer times at every step; a reviewer reads the rest. Two full runs on the live site on 10 October found 11 and then 12 real bugs. Each became a test request and a fix.
 - **Offline checks**: `npm run check` runs 13 check scripts with no network (geometry, context, time and deadlines, agent guards, relay guards, and eight for the planner, including 28 recorded searches that must give the same plans).
-- **A real ride**: on 18 October Shreyas rode from Nashik to Navi Mumbai (about four hours) with Trippy open and asked 28 questions. Shruti compared the debug export and GPS tracks with the code and found 11 problems plus 6 more in the log. They became PRs #31 to #34: a stale ETA banner, old minutes quoted as current, a flight check measured to the hotel instead of the airport, picks behind the car listed first, two-wheeler garages for a car, "Failed to fetch" shown as a reply, "end here" that did not end the trip, no way to see the car on the map, and real stops missing from the trip. The same ride gave a comparison with Google Maps and Gemini (see below).
-- **Planner**: golden checks hold the TypeScript planner to the answers of its first Python version; the request reader scored 19 of 20 on the original set and 36 of 36 on 12 new requests (PR #35).
+- **A real ride**: on 18 October Shreyas rode from Nashik to Navi Mumbai (about four hours) with Trippy open and asked 28 questions. Shruti compared the debug export and GPS tracks with the code and found 11 problems plus 6 more in the log. We fixed them all: a stale ETA banner, old minutes quoted as current, a flight check measured to the hotel instead of the airport, picks behind the car listed first, two-wheeler garages for a car, "Failed to fetch" shown as a reply, "end here" that did not end the trip, no way to see the car on the map, and real stops missing from the trip. The same ride gave a comparison with Google Maps and Gemini (see below).
+- **Planner**: golden checks hold the TypeScript planner to the answers of its first Python version; the request reader scored 19 of 20 on the original set and 36 of 36 on 12 new requests.
 
 Where Trippy differed from Google Maps and Gemini on that ride: for tea, Google Maps showed a place behind the car and Trippy one on the way; for toilets Google Maps listed places in a radius, while Trippy said none were on the route; for "garage" Google Maps showed two-wheeler garages and Trippy a four-wheeler service centre; Gemini kept no memory between questions. Google Maps shows much more map detail than Trippy.
 
@@ -127,7 +130,7 @@ The second option on the landing screen: "Plan an outing". Describe an outing ("
 - Add `?noweb` to the address to plan without web evidence (no Tavily calls), for test runs.
 
 ## End-to-end tests
-`npm run e2e` drives the ten trip flows of the design bus (`E2E.md`) in real browsers, one browser context each, in parallel. It costs model and Maps calls, so run it only on purpose.
+`npm run e2e` drives ten long trip flows (`tests/e2e/flows.ts`) in real browsers, one browser context each, in parallel. It costs model and Maps calls, so run it only on purpose.
 First time: `npx playwright install chromium`. Pick flows by id: `npm run e2e -- F1 F10`.
 
 ```
@@ -137,13 +140,12 @@ npm run e2e -- --local=5174 F1 F10   # localhost (web app on 5174 and npm run de
 Other flags: `--url=<site>`, `--chrome` (installed Chrome), `--headed`. Results go to `test-results/e2e/<time>/`: `summary.json` (every code check, the judge notes for a reviewer), and per flow each step's screen text, screenshot and trip document plus the flow's debug log. Flows are data in `tests/e2e/flows.ts`, helpers in `tests/e2e/lib.ts`. The exit code is 1 when a code check failed.
 
 ## Deploy (Cloudflare, free plan)
-- App (Pages project `trippy`): https://trippy-c20.pages.dev. Pushing to `main` rebuilds it; other branches get preview URLs (`https://<branch>.trippy-c20.pages.dev`).
-  Pages settings: build command `npm run build -w apps/web`, output `apps/web/dist`, variables `NODE_VERSION=22`, `VITE_PROXY_URL` (the Worker URL), `GOOGLE_MAPS_BROWSER_KEY`.
-- Proxy (Worker `trippy-proxy`): https://trippy-proxy.trippy-app.workers.dev, config in `apps/proxy/wrangler.toml`, entry `apps/proxy/src/worker.ts` (wraps `handler.ts`). Pushing to `main` redeploys it (Workers Builds, root directory `apps/proxy`).
+- App (Pages project `trippy`, direct upload): https://trippy-c20.pages.dev. Build with `VITE_PROXY_URL=<the Worker URL> npm run build -w apps/web`, then from `apps/web`: `npx wrangler pages deploy dist --project-name trippy --branch main`. Another `--branch` gives a preview URL (`https://<branch>.trippy-c20.pages.dev`).
+- Proxy (Worker `trippy-proxy`): https://trippy-proxy.trippy-app.workers.dev, config in `apps/proxy/wrangler.toml`, entry `apps/proxy/src/worker.ts` (wraps `handler.ts`). Deploy from `apps/proxy` with `npx wrangler deploy`.
   Secrets live only in Cloudflare (Worker -> Settings -> Variables and Secrets): `NEBIUS_API_KEY`, `GOOGLE_MAPS_SERVER_KEY`, `TAVILY_API_KEY`.
   Allowed web origins are `ALLOWED_ORIGINS` in `wrangler.toml` (a `https://*.host` entry also accepts preview subdomains).
   Daily caps are counted in a Durable Object (`Caps` in `worker.ts`), so they survive restarts.
-- Manual deploy of the Worker: `npm run deploy -w apps/proxy` (needs `npx wrangler login` once). The local Node proxy (`npm run dev:proxy`) stays for development.
+- Both deploys need `npx wrangler login` once. The local Node proxy (`npm run dev:proxy`) stays for development.
 - Google Cloud: the browser key's website restrictions must list `https://trippy-c20.pages.dev/*` and `https://*.trippy-c20.pages.dev/*`.
 
 ## Layout

@@ -6,3 +6,5 @@ logs
 .wrangler
 .dev.vars
 test-results
+CLAUDE.md
+video/
