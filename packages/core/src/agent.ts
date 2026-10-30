@@ -146,7 +146,14 @@ export async function ask(p: MapProvider, trip: Trip, text: string, onStep = (_:
   const ran = new Map<string, string>() // tool + args -> result, for the calls that ran this turn
   let tier: CallType = 'pick' // Super, reasoning off; switches to 'plan' for planning-type questions
   const skipped: Step[] = [] // calls the code did not run: held back with a warning, or a repeat of one that ran
-  const done = (text: string, extra: Partial<Answer> = {}): Answer => ({ text, steps, memory, link, skipped, ...extra })
+  // A note the code saved for every trip is never described as "for this trip" (the model wrote that after "No, he's always
+  // diabetic" moved the note to the profile, 2026-10-30).
+  const forEvery = (s: string) => {
+    if (!memory.add.some(n => n.scope === 'profile')) return s
+    const t = s.replace(/\bfor (this|the) (trip|ride|journey)\b/gi, 'for every trip')
+    return /every trip|all (your )?trips|always/i.test(t) ? t : `${t} Saved for every trip.`
+  }
+  const done = (text: string, extra: Partial<Answer> = {}): Answer => ({ text: forEvery(text), steps, memory, link, skipped, ...extra })
   const fresh = new Set<string>() // refs eta_from_here measured this turn: their minutes are current
   let staled = false
 
