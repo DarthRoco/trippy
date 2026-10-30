@@ -265,8 +265,10 @@ export function useTrip() {
       log('answer', a) // text, tool steps, memory ops, search, link
       // Code applies all state changes; the model only asked for them via remember / forget (Q17).
       const { add, remove } = a.memory
-      // A deadline replaced by a newer one goes quietly: no "Forgot:" line for it.
-      gone = [...profile, ...t.notes].filter(n => remove.includes(n.id) && !n.text.startsWith('Deadline:')).map(n => forgotLine(n.text))
+      // No "Forgot:" line for a deadline replaced by a newer one, or for a note re-saved this turn (moved from this trip
+      // to every trip: "No, he's always diabetic" showed "Forgot: Dad is diabetic", 2026-10-30).
+      const moved = (n: Note) => add.some(a => a.text.trim().toLowerCase() === n.text.trim().toLowerCase())
+      gone = [...profile, ...t.notes].filter(n => remove.includes(n.id) && !n.text.startsWith('Deadline:') && !moved(n)).map(n => forgotLine(n.text))
       const kept = (ns: Note[], scope: 'trip' | 'profile') =>
         [...ns.filter(n => !remove.includes(n.id)), ...add.filter(n => n.scope === scope).map(({ id, text }) => ({ id, text }))]
       setProfile(ps => kept(ps, 'profile'))
