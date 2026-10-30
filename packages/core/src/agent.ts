@@ -81,10 +81,10 @@ const MENTIONS = /\b(flight|train|airport|station|deadline|make it(?! to)|on tim
 // Who is on this ride is a trip note, not a lasting fact about a person (DECISIONS 2026-10-10, TESTSET #51).
 export const ON_RIDE = /\b(with us|on board|along with us|travell?ing with)\b/i
 // Notes are for this trip; the profile only when the user's own words ask to keep it (decided 2026-10-21, ride item 6: "dad is
-// diabetic" went to the profile unasked). Code checks the user's words, not the model's scope.
+// diabetic" went to the profile unasked). Code checks the user's words, not the model's scope, both ways: "Always remember that
+// dad is diabetic" was saved for the trip when the model asked `trip` (demo recording, 2026-10-30).
 export const FOREVER = /\b(always|every (trip|time|ride|journey)|all (my |our )?(trips|rides)|future trips?|next time|permanent(ly)?|for good|forever|hamesha|har baar)\b/i
-const scopeOf = (said: string, note: string, model = 'profile') =>
-  model === 'profile' && FOREVER.test(said) && !ON_RIDE.test(note) ? 'profile' as const : 'trip' as const
+const scopeOf = (said: string, note: string) => FOREVER.test(said) && !ON_RIDE.test(note) ? 'profile' as const : 'trip' as const
 // Vehicle smoke or fire (TESTSET #50): the safety text comes from code, then the model searches a mechanic in the same turn.
 export const isVehicleFire = (text: string) => /\b(smok\w*|fire|flames?|burning|dhua\w*)\b/i.test(text) &&
   /\b(car|gaadi|gadi|bonnet|hood|engine|vehicle|bike|taxi|cab)\b/i.test(text)
@@ -280,7 +280,7 @@ export async function ask(p: MapProvider, trip: Trip, text: string, onStep = (_:
           }
           break
         case 'remember': {
-          const scope = scopeOf(text, String(args.note ?? ''), args.scope)
+          const scope = scopeOf(text, String(args.note ?? ''))
           result = `saved as ${note(String(args.note ?? ''), scope)}, ${scope === 'trip' ? 'for this trip only' : 'for every trip'}`
           break
         }

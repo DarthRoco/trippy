@@ -179,6 +179,10 @@ const scope = async (text: string, note: string) => (await turn([[tc('remember',
 assert.deepEqual([await scope('Remember that dad is diabetic', 'Dad is diabetic'), await scope('always remember dad is diabetic', 'Dad is diabetic'),
   await scope('remember for next time: mom is allergic to nuts', 'Mom is allergic to nuts'), await scope('remember for every trip, grandma is with us', 'Grandma is with us')],
   ['trip', 'profile', 'profile', 'trip'])
+// The user's "always" wins even when the model asks for the trip (demo recording 2026-10-30).
+const asTrip = async (text: string, note: string) => (await turn([[tc('remember', { note, scope: 'trip' })], [tc('reply', { text: 'ok' })]], t1, text)).memory.add[0].scope
+assert.deepEqual([await asTrip('Always remember that dad is diabetic', 'Dad is diabetic'), await asTrip('Remember that dad is diabetic', 'Dad is diabetic')],
+  ['profile', 'trip'])
 
 // Ride 2026-10-18 (5): a 28 min old search's minutes are not shown as current: left out of the context and history, a reply quoting
 // them goes back once, then carries their age. A search from the destination, a fresh one, or an eta_from_here this turn is fine.
