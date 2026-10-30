@@ -3,7 +3,7 @@
 Trippy is an AI decision layer on top of Google Maps data, for passengers in India. You say what the car needs ("dad is hungry, something like Domino's within 20 minutes", in English or Hinglish). Trippy finds real places along your route, checks live travel times and opening hours, weighs the trade-off for your group and shows the best three on a map with a short reason for each. It also plans outings before you leave. It is not a navigation app: Google routes, Trippy decides.
 
 - Live app: https://trippy-c20.pages.dev (no key or sign-in needed)
-- Video: <YouTube link>
+- Video: https://youtu.be/I10ptoImWnY
 - Built for the Nebius x NVIDIA Global AI Hackathon, track Best Apps and Agents. Models: NVIDIA Nemotron 3 (Nano, Super, Ultra) on Nebius Token Factory.
 - Team: Shreyas Bhat ([DarthRoco](https://github.com/DarthRoco)) and Shruti Prakhya ([wannabe-yoda](https://github.com/wannabe-yoda)).
 - History: this repo was started fresh when the project was renamed to Trippy on 29 October 2026. The work from 1 to 29 October (pull requests, design notes, test logs) lives in our private working repo; the code here is the same.
