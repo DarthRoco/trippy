@@ -78,6 +78,13 @@ All models run on Nebius Token Factory (OpenAI-compatible API) through the relay
 | Read an outing request into fields (planner) | `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B` (Nano) | off |
 | Read web evidence, write one-line reasons (planner) | Super | off |
 
+### How Nebius Token Factory helped
+- **One API, every Nemotron size.** Token Factory serves Nano, Super and Ultra behind one OpenAI-compatible endpoint, so each job gets its own model by changing one config line, not a new provider. On day 1 we ran the same tool-picking requests through all three and chose from the results in an afternoon.
+- **Reasoning as a switch.** Ultra runs with reasoning off for ranking (a passenger is waiting) and on for planning questions (nobody is waiting), from the same model on the same endpoint.
+- **Fast enough for a car.** Super picks the tool in about 1.5 seconds with reasoning off, which keeps a full answer (search plus ranking) around 10 seconds.
+- **Cheap to test hard.** Our test set (71 requests, run three times each on real routes) and ten end-to-end flows ran on Token Factory many times over without hitting limits, so prompt changes were checked against real model answers, not guesses.
+- **Nothing else to host.** No GPUs or model servers: the relay on Cloudflare Workers holds the Nebius key and forwards calls, so the whole backend is stateless.
+
 Why these: in our day-1 tests Nano picked the right tool 3 times in 6 and Super 6 in 6, so Nano stays out of the trip agent. Super invented facts when ranking; Ultra gave grounded reasons. A user can paste their own OpenAI-compatible key in Settings; calls then go straight from the phone to that provider (the planner does not use it).
 
 ## Privacy
